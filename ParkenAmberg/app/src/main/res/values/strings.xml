@@ -1,4 +1,20 @@
 <resources>
     <string name="app_name">ParkenAmberg</string>
     <string name="title_activity_park">Parken in Amberg</string>
+    <string name="garage0">Parkgarage am Kurfürstenbad</string>
+    <string name="garage1">Theatergarage</string>
+    <string name="garage2">Parkdeck Kräuterwiese</string>
+    <string name="garage3">Parkgarage am Ziegeltor</string>
+    <string name="garage4">Kurfürstenbad</string>
+    <string name="garage5">Cineplex Amberg</string>
+    <string name="garage6">Amberger Congress Centrum</string>
+    <string name="garage7">Altstadtgarage</string>
+    <string name="address0">Ernst-Michl-Platz, 92224 Amberg</string>
+    <string name="address1">Mühlgasse 5, 92224 Amberg</string>
+    <string name="address2">Sulzbacher Str. 2, 92224 Amberg</string>
+    <string name="address3">Pfalzgrafenring 3, 92224 Amberg</string>
+    <string name="address4">Kurfürstenring 2, 92224 Amberg</string>
+    <string name="address5">Regensburger Str. 1, 92224 Amberg</string>
+    <string name="address6">Schießstätteweg 8, 92224 Amberg</string>
+    <string name="address7">Kaiser-Ludwig-Ring 2, 92224 Amberg</string>
 </resources>
