@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -426,8 +427,10 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     public void onConnected(@Nullable Bundle bundle) {
         Log.d("GoogleAPI", "onConnected()");
 
-        GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
-        addGeofence(geofenceRequest);
+        if(geofences.isEmpty()) {
+            GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
+            addGeofence(geofenceRequest);
+        }
     }
 
     @Override
