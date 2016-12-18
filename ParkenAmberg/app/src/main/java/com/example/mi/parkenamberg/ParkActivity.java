@@ -59,6 +59,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
 
         garages = new ArrayList<>();
         markers = new ArrayList<>();
+        geofences = new ArrayList<>();
         coder = new Geocoder(this);
         CreateGoogleApi();
 
@@ -66,18 +67,12 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         provider = locationManager.GPS_PROVIDER;
 
         //minZeit in ms, minDistance
-        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(provider, locationUpdateInterval, locationUpdateDistance, locationListener);
         }
         else {
-            locationManager.requestLocationUpdates(provider, locationUpdateInterval, locationUpdateDistance, locationListener);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -174,9 +169,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
             }
         }
 
-        GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
-        addGeofence(geofenceRequest);
-
         mMap.moveCamera(CameraUpdateFactory.newLatLng(locationAmberg));
         //Map auf Überblick über Ring zoomen
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
@@ -189,6 +181,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
      */
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
         }
         public void onProviderDisabled(String provider) {
         }
@@ -398,7 +391,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         Log.d("Geofence", "createGeofencePendingIntent()");
         if ( geoFencePendingIntent != null )
             return geoFencePendingIntent;
-
         Intent intent = new Intent( this, GeofenceTransitionService.class);
         return PendingIntent.getService(
                 this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
@@ -433,6 +425,9 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d("GoogleAPI", "onConnected()");
+
+        GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
+        addGeofence(geofenceRequest);
     }
 
     @Override
