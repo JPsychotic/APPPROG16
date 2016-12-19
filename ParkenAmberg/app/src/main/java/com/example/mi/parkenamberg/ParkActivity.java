@@ -127,7 +127,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   public void onMapReady(GoogleMap googleMap)
   {
     mMap = googleMap;
-    garageManager = new GarageManager(this);
 
     GarageManager.UpdateFinishedCallback callback = new GarageManager.UpdateFinishedCallback()
     {
@@ -146,7 +145,9 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
       }
     };
 
-    garageManager.Update(callback);
+    garageManager = new GarageManager(this);
+    garageManager.UpdateCallback = callback;
+    garageManager.Update();
   }
 
   void SetMarkerOnMap()

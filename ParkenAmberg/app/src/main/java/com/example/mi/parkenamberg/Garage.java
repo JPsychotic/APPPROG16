@@ -24,29 +24,29 @@ public class Garage {
     private int maxPlaetze;
     private int curPlaetze;
 
-    public int getCurPlaetze() {
+    int getCurPlaetze() {
         return curPlaetze;
     }
 
-    public void setCurPlaetze(int curPlaetze) {
+    void setCurPlaetze(int curPlaetze) {
         this.curPlaetze = curPlaetze;
     }
 
-    public int getMaxPlaetze() {
+    int getMaxPlaetze() {
         return maxPlaetze;
     }
 
-    public void setMaxPlaetze(int maxPlaetze) {
+    void setMaxPlaetze(int maxPlaetze) {
         this.maxPlaetze = maxPlaetze;
     }
 
-    public Garage(LatLng l, String n, int id) {
+    Garage(LatLng l, String n, int id) {
         if(l != null) location = l;
         name = n;
         this.id = id;
     }
 
-    public LatLng getLocation() {
+    LatLng getLocation() {
         return location;
     }
 

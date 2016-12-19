@@ -3,6 +3,7 @@ package com.example.mi.parkenamberg;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -22,9 +23,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 class GarageManager
 {
-  public Boolean Initialized = false;
+  Boolean Initialized = false;
   private Geocoder coder;
   private Garage[] garages = new Garage[8];
+  UpdateFinishedCallback UpdateCallback;
+  private Handler internalUpdateHandler = new Handler();
 
   GarageManager(ParkActivity mainActivity)
   {
@@ -38,6 +41,18 @@ class GarageManager
     garages[5] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address5)), mainActivity.getString(R.string.garage5), 6));
     garages[6] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address6)), mainActivity.getString(R.string.garage6), 7));
     garages[7] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address7)), mainActivity.getString(R.string.garage7), 8));
+
+    Runnable runnable = new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        Log.d("GarageManager","Update running...");
+        Update();
+        internalUpdateHandler.postDelayed(this, 60000);
+      }
+    };
+    internalUpdateHandler.postDelayed(runnable, 10000);
   }
 
   interface UpdateFinishedCallback
@@ -84,7 +99,7 @@ class GarageManager
     return l;
   }
 
-  void Update(final UpdateFinishedCallback UpdateCallback)
+  void Update()
   {
     HTTPRequest.TaskListener listener = new HTTPRequest.TaskListener()
     {
@@ -93,7 +108,10 @@ class GarageManager
       {
         Boolean success = UpdatePlaetze(result);
         Initialized = success;
-        UpdateCallback.onFinished(success);
+        if (UpdateCallback != null)
+        {
+          UpdateCallback.onFinished(success);
+        }
       }
     };
 
@@ -109,7 +127,6 @@ class GarageManager
   {
     try
     {
-      Log.d("DEBUG", doc.toString());
       NodeList nodes = doc.getElementsByTagName("Parkhaus");
       for (int i = 0; i < nodes.getLength(); i++)
       {
