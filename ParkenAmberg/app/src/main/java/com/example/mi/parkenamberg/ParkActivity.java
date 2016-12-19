@@ -5,8 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,8 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -34,19 +30,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 
 public class ParkActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
   GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ResultCallback<Status>
@@ -128,6 +113,9 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   {
     mMap = googleMap;
 
+    SetMarkerOnMap();
+    AddGeofences();
+
     GarageManager.UpdateFinishedCallback callback = new GarageManager.UpdateFinishedCallback()
     {
       @Override
@@ -135,8 +123,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
       {
         if (success)
         {
-          SetMarkerOnMap();
-          AddGeofences();
+          UpdateMarkers();
         }
         else
         {
@@ -177,7 +164,8 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   {
     public void onLocationChanged(Location location)
     {
-      mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+      if(mMap != null)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
     }
 
     public void onProviderDisabled(String provider)
@@ -387,7 +375,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   }
   void AddGeofences()
   {
-    if (geofences.isEmpty() && gAPIConnected && garageManager.Initialized)
+    if (!geofences.isEmpty() && gAPIConnected)
     {
       GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
       addGeofence(geofenceRequest);
