@@ -2,6 +2,8 @@ package com.example.mi.parkenamberg;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,10 +22,12 @@ import java.util.List;
 public class GeofenceTransitionService extends IntentService {
 
     private static final String TAG = GeofenceTransitionService.class.getSimpleName();
-    public static final int GEOFENCE_NOTIFICATION_ID = 0;
+    public static final String GEOFENCE_SERVICE_ID = "Geofence_Transition_Service";
+    private Handler mainHandle;
 
     public GeofenceTransitionService() {
         super(TAG);
+        mainHandle = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -41,35 +45,26 @@ public class GeofenceTransitionService extends IntentService {
         // Retrieve GeofenceTrasition
         int geoFenceTransition = geofencingEvent.getGeofenceTransition();
         // Check if the transition type
-        if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             // Get the geofence that were triggered
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-            // Create a detail message with Geofences received
-            String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences );
-            // Show Toast
-            showToast(geofenceTransitionDetails);
-            // Speak the message
 
+            //Create String with ids
+            String geofenceIds = "";
+            for (Geofence g: triggeringGeofences) {
+                String strid = g.getRequestId();
+                geofenceIds += strid.replace("Geofence", "") + ";";
+            }
+            //Delete the last ;
+            geofenceIds = geofenceIds.substring(0, geofenceIds.length() - 1);
+
+            //send the ids to the activity
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(ParkActivity.GeofenceResponseReceiver.GEOFENCE_RESPONSE);
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra(GEOFENCE_SERVICE_ID, geofenceIds);
+            sendBroadcast(broadcastIntent);
         }
-    }
-
-    private void showToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    // Create a detail message with Geofences received
-    private String getGeofenceTrasitionDetails(int geoFenceTransition, List<Geofence> triggeringGeofences) {
-        // get the ID of each geofence triggered
-        ArrayList<String> triggeringGeofencesList = new ArrayList<>();
-        for ( Geofence geofence : triggeringGeofences ) {
-            triggeringGeofencesList.add( geofence.getRequestId() );
-        }
-
-        String status = null;
-        if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER )
-            status = "Entering ";
-
-        return status + TextUtils.join( ", ", triggeringGeofencesList);
     }
 
     // Handle errors

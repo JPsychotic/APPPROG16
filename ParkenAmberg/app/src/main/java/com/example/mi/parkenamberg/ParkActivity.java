@@ -2,8 +2,10 @@ package com.example.mi.parkenamberg;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -63,6 +67,12 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
     }
 
+    //Start BroadcastReceiver
+    IntentFilter filter = new IntentFilter(GeofenceResponseReceiver.GEOFENCE_RESPONSE);
+    filter.addCategory(Intent.CATEGORY_DEFAULT);
+    receiver = new GeofenceResponseReceiver();
+    registerReceiver(receiver, filter);
+
     // Obtain the SupportMapFragment and get notified when the map is ready to be used.
     SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
       .findFragmentById(R.id.map);
@@ -88,6 +98,12 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     googleApiClient.disconnect();
   }
 
+  @Override
+  public void onDestroy() {
+    this.unregisterReceiver(receiver);
+    super.onDestroy();
+  }
+
   // Google Map methods and variables
   private GoogleMap mMap;
   public Boolean gAPIConnected = false;
@@ -96,6 +112,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   private String provider;
   // Wird benötigt um sich zu speichern, für welchen Marker ein InfoWindow angezeigt wird
   private Marker marker = null;
+  private Marker userPos;
   private List<Marker> markers;
   //Zeit in ms nach der ein Location-Update durchgeführt wird
   private final int locationUpdateInterval = 5000;
@@ -113,6 +130,9 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   public void onMapReady(GoogleMap googleMap)
   {
     mMap = googleMap;
+    mMap.moveCamera(CameraUpdateFactory.newLatLng(locationAmberg));
+    //Map auf Überblick über Ring zoomen
+    mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
 
     SetMarkerOnMap();
     AddGeofences();
@@ -128,7 +148,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         }
         else
         {
-          // TODO, something died horribly while trying to get or parse the xml
+          Log.d("XML", "Parsing failed");
         }
       }
     };
@@ -149,10 +169,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
       }
     }
 
-    mMap.moveCamera(CameraUpdateFactory.newLatLng(locationAmberg));
-    //Map auf Überblick über Ring zoomen
-    mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
-
     mMap.setOnMarkerClickListener(this);
   }
 
@@ -163,8 +179,21 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   {
     public void onLocationChanged(Location location)
     {
-      if(mMap != null)
+      if(mMap != null) {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+
+        if(userPos == null) {
+          BitmapDescriptor icon;
+          icon = BitmapDescriptorFactory.fromResource(R.drawable.pos);
+
+          userPos = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude()))
+                  .title(getString(R.string.userposition))
+                  .icon(icon));
+        }
+        else {
+          userPos.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+        }
+      }
     }
 
     public void onProviderDisabled(String provider)
@@ -282,7 +311,8 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   private List<Geofence> geofences;
   private PendingIntent geoFencePendingIntent;
   private final int GEOFENCE_REQ_CODE = 0;
-  private final float GEOFENCE_RADIUS = 500.0f;
+  private final float GEOFENCE_RADIUS = 250.0f;
+  private boolean geofencesAdded = false;
 
   /**
    * This method creates a Geofence
@@ -370,7 +400,10 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   {
     Log.d("GoogleAPI", "onConnected()");
     gAPIConnected = true;
-    AddGeofences();
+    if(!geofencesAdded) {
+      AddGeofences();
+      geofencesAdded = true;
+    }
   }
   void AddGeofences()
   {
@@ -406,6 +439,34 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         .addOnConnectionFailedListener(this)
         .addApi(LocationServices.API)
         .build();
+    }
+  }
+
+  //Broadcast Receiver
+  private GeofenceResponseReceiver receiver;
+
+  /**
+   * Class to receive the Broadcast from the GeofenceTransitionService
+   */
+  public class GeofenceResponseReceiver extends BroadcastReceiver {
+    public static final String GEOFENCE_RESPONSE = "Geofence_Response_Message";
+
+    public GeofenceResponseReceiver() {
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      String ids = intent.getStringExtra(GeofenceTransitionService.GEOFENCE_SERVICE_ID);
+
+      if(ids == null) return;
+
+      String[] triggeredGarages = ids.split(";");
+
+      for (String i: triggeredGarages) {
+        Garage g = garageManager.GetGarageById(Integer.parseInt(i));
+        if(g != null)
+          Toast.makeText(context, g.getName(),Toast.LENGTH_SHORT).show();
+      }
     }
   }
 }

@@ -17,4 +17,5 @@
     <string name="address5">Regensburger Str. 1, 92224 Amberg</string>
     <string name="address6">Schießstätteweg 8, 92224 Amberg</string>
     <string name="address7">Kaiser-Ludwig-Ring 2, 92224 Amberg</string>
+    <string name="userposition">Aktuelle Position</string>
 </resources>

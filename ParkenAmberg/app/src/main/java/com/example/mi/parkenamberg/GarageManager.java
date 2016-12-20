@@ -181,6 +181,25 @@ class GarageManager
     return null;
   }
 
+  /**
+   * Returns the garage with the id
+   *
+   * @param id of garage
+   * @return returns the garage or null
+   */
+  Garage GetGarageById(int id)
+  {
+    for (Garage g : garages)
+    {
+      if (g.getId() == id)
+      {
+        return g;
+      }
+    }
+
+    return null;
+  }
+
   private static class HTTPRequest extends AsyncTask<String, Void, Document>
   {
     interface TaskListener
