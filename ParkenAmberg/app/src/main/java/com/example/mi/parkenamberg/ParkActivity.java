@@ -41,6 +41,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
+    garageManager = new GarageManager(this);
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_park);
 
@@ -131,8 +132,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         }
       }
     };
-
-    garageManager = new GarageManager(this);
     garageManager.UpdateCallback = callback;
     garageManager.Update();
   }
@@ -375,7 +374,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   }
   void AddGeofences()
   {
-    if (!geofences.isEmpty() && gAPIConnected)
+    if(!geofences.isEmpty() && gAPIConnected)
     {
       GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
       addGeofence(geofenceRequest);
