@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -36,11 +37,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ParkActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
   GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ResultCallback<Status>
 {
-  // Allgemeine Variablen
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -66,6 +67,9 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     {
       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
     }
+
+    //Initialize the TextToSpeech API
+    resultSpeaker = new TextToSpeech(this, this.TTSOnInitListener);
 
     //Start BroadcastReceiver
     IntentFilter filter = new IntentFilter(GeofenceResponseReceiver.GEOFENCE_RESPONSE);
@@ -312,7 +316,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   private PendingIntent geoFencePendingIntent;
   private final int GEOFENCE_REQ_CODE = 0;
   private final float GEOFENCE_RADIUS = 250.0f;
-  private boolean geofencesAdded = false;
 
   /**
    * This method creates a Geofence
@@ -400,10 +403,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   {
     Log.d("GoogleAPI", "onConnected()");
     gAPIConnected = true;
-    if(!geofencesAdded) {
-      AddGeofences();
-      geofencesAdded = true;
-    }
+    AddGeofences();
   }
   void AddGeofences()
   {
@@ -442,6 +442,16 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     }
   }
 
+  //TextToSpeech API
+  TextToSpeech resultSpeaker;
+
+  TextToSpeech.OnInitListener TTSOnInitListener = new TextToSpeech.OnInitListener() {
+    @Override
+    public void onInit(int status) {
+      resultSpeaker.setLanguage(Locale.GERMANY);
+    }
+  };
+
   //Broadcast Receiver
   private GeofenceResponseReceiver receiver;
 
@@ -464,9 +474,29 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
 
       for (String i: triggeredGarages) {
         Garage g = garageManager.GetGarageById(Integer.parseInt(i));
-        if(g != null)
-          Toast.makeText(context, g.getName(),Toast.LENGTH_SHORT).show();
+        if(g != null) {
+          String resultMessage = createResultMessage(g);
+          Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show();
+          resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
+        }
       }
+    }
+
+    /**
+     * Creates the message to show and speak.
+     *
+     * @param g the Garage which is near the user's position.
+     * @return the message
+       */
+    private String createResultMessage(Garage g) {
+      String msg = "Das Parkhaus " + g.getName() + " befindet sich in ihrer Nähe.";
+
+      if(g.getMaxPlaetze() - g.getCurPlaetze() > 0)
+        msg += " Es sind " + g.getCurPlaetze() + " Parkplätze frei.";
+      else
+        msg += " Leider sind keine Parkplätze frei.";
+
+      return msg;
     }
   }
 }
