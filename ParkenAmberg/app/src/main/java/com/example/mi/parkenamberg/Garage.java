@@ -10,15 +10,7 @@ public class Garage {
     //ID im XML-Dokument
     private int id;
     private LatLng location;
-    //Montag - Freitag Öffnungszeiten
-    private int MoFrOeffnung;
-    private int MoFrSchliess;
-    //Samstag Öffnungszeiten
-    private int SaOeffnung;
-    private int SaSchliess;
-    //Sonntag Öffnungszeiten
-    private int SoSchliess;
-    private int SoOeffnung;
+    private boolean opened;
 
     private String name;
     private int maxPlaetze;
@@ -44,6 +36,7 @@ public class Garage {
         if(l != null) location = l;
         name = n;
         this.id = id;
+        opened = true;
     }
 
     LatLng getLocation() {
@@ -57,6 +50,10 @@ public class Garage {
     public int getId() {
         return id;
     }
+
+    public boolean isOpened() { return opened; }
+
+    public void setOpened(boolean open) {opened = open; }
 
 
 }
