@@ -14,9 +14,12 @@ import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,16 +42,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ParkActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
+public class ParkActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
   GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, ResultCallback<Status>
 {
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
-    garageManager = new GarageManager(this);
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_park);
+
+    garageManager = new GarageManager(this);
 
     markers = new ArrayList<>();
     geofences = new ArrayList<>();
@@ -81,6 +85,31 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
       .findFragmentById(R.id.map);
     mapFragment.getMapAsync(this);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.menu, menu);
+
+    return super.onCreateOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.maptype:
+      {
+        if(mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL)
+          mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        else
+          mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        break;
+      }
+      default:
+        break;
+    }
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
