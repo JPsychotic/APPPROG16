@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ParkActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
-  GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ResultCallback<Status>
+  GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, ResultCallback<Status>
 {
 
   @Override
@@ -55,7 +55,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     CreateGoogleApi();
 
     locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    provider = locationManager.GPS_PROVIDER;
+    provider = LocationManager.GPS_PROVIDER;
 
     //minZeit in ms, minDistance
     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -114,8 +114,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   private GarageManager garageManager;
   private LocationManager locationManager;
   private String provider;
-  // Wird benötigt um sich zu speichern, für welchen Marker ein InfoWindow angezeigt wird
-  private Marker marker = null;
   private Marker userPos;
   private List<Marker> markers;
   //Zeit in ms nach der ein Location-Update durchgeführt wird
@@ -134,6 +132,8 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
   public void onMapReady(GoogleMap googleMap)
   {
     mMap = googleMap;
+    mMap.setInfoWindowAdapter(new GarageInfoWindow(this, garageManager));
+
     mMap.moveCamera(CameraUpdateFactory.newLatLng(locationAmberg));
     //Map auf Überblick über Ring zoomen
     mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
@@ -172,8 +172,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         geofences.add(GetGeofence(g.getLocation(), g.getId()));
       }
     }
-
-    mMap.setOnMarkerClickListener(this);
   }
 
   /**
@@ -213,7 +211,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     }
   };
 
-
   /**
    * Gets the right marker-icon for the garage
    *
@@ -250,28 +247,6 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     return icon;
-  }
-
-  /**
-   * Marker Click Handler
-   *
-   * @param marker
-   * @return
-   */
-  @Override
-  public boolean onMarkerClick(Marker marker)
-  {
-    if (this.marker != null && this.marker.equals(marker))
-    {
-      marker.hideInfoWindow();
-      this.marker = null;
-    }
-    else
-    {
-      marker.showInfoWindow();
-      this.marker = marker;
-    }
-    return true;
   }
 
   /**
@@ -477,6 +452,7 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
         if(g != null) {
           String resultMessage = createResultMessage(g);
           Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show();
+          //Deprecated after API 21 or sth like that, but LG Fino uses API 19
           resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
         }
       }
@@ -491,6 +467,13 @@ public class ParkActivity extends FragmentActivity implements GoogleApiClient.Co
     private String createResultMessage(Garage g) {
       String msg = "Das Parkhaus " + g.getName() + " befindet sich in ihrer Nähe.";
 
+      //Falls Geschlossen...
+      if(!g.isOpened()) {
+        msg += " Das Parkhaus ist leider geschlossen.";
+        return msg;
+      }
+
+      //Freie Parkplätze ausgeben
       if(g.getMaxPlaetze() - g.getCurPlaetze() > 0)
         msg += " Es sind " + g.getCurPlaetze() + " Parkplätze frei.";
       else
