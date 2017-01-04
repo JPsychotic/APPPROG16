@@ -497,7 +497,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       String msg = "Das Parkhaus " + g.getName() + " befindet sich in ihrer Nähe.";
 
       //Falls Geschlossen...
-      if(!g.isOpened()) {
+      if(g.closed) {
         msg += " Das Parkhaus ist leider geschlossen.";
         return msg;
       }

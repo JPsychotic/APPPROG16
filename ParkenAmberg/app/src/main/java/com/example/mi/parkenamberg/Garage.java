@@ -10,7 +10,7 @@ public class Garage {
     //ID im XML-Dokument
     private int id;
     private LatLng location;
-    private boolean opened;
+    public boolean closed = false;
 
     private String name;
     private int maxPlaetze;
@@ -32,11 +32,11 @@ public class Garage {
         this.maxPlaetze = maxPlaetze;
     }
 
-    Garage(LatLng l, String n, int id) {
+    Garage(LatLng l, String n, int id)
+    {
         if(l != null) location = l;
         name = n;
         this.id = id;
-        opened = true;
     }
 
     LatLng getLocation() {
@@ -50,10 +50,5 @@ public class Garage {
     public int getId() {
         return id;
     }
-
-    public boolean isOpened() { return opened; }
-
-    public void setOpened(boolean open) {opened = open; }
-
 
 }
