@@ -20,4 +20,5 @@
     <string name="userposition">Aktuelle Position</string>
     <string name="favourites">Favoriten</string>
     <string name="maptype">Kartentyp ändern</string>
+    <string name="noInternet">Keine Internetverbindung</string>
 </resources>

@@ -4,7 +4,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -28,9 +30,11 @@ class GarageManager
   private Garage[] garages = new Garage[8];
   UpdateFinishedCallback UpdateCallback;
   private Handler internalUpdateHandler = new Handler();
+  private ParkActivity context;
 
   GarageManager(ParkActivity mainActivity)
   {
+    context = mainActivity;
     coder = new Geocoder(mainActivity);
 
     garages[0] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address0)), mainActivity.getString(R.string.garage0), 1));
@@ -115,7 +119,7 @@ class GarageManager
       }
     };
 
-    HTTPRequest task = new HTTPRequest(listener);
+    HTTPRequest task = new HTTPRequest(listener, context);
 
     task.execute();
   }
@@ -214,11 +218,13 @@ class GarageManager
 
     // This is the reference to the associated listener
     private final TaskListener taskListener;
+    private ParkActivity context;
 
-    HTTPRequest(TaskListener listener)
+    HTTPRequest(TaskListener listener, ParkActivity act)
     {
       // The listener reference is passed in through the constructor
       this.taskListener = listener;
+      context = act;
     }
 
     @Override
@@ -243,13 +249,23 @@ class GarageManager
       {
         URL url = new URL("http://parken.amberg.de/wp-content/uploads/pls/pls.xml");
         URLConnection conn = url.openConnection();
-
+        conn.setConnectTimeout(1000);
+        conn.setReadTimeout(1000);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         doc = builder.parse(conn.getInputStream());
-      } catch (Exception e)
+      }
+      catch (Exception e)
       {
-        // well, shit
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Toast.makeText(context, R.string.noInternet, Toast.LENGTH_SHORT).show();
+          }
+        });
       }
       return doc;
     }
