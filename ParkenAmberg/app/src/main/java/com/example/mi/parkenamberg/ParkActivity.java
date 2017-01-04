@@ -82,8 +82,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     registerReceiver(receiver, filter);
 
     // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-      .findFragmentById(R.id.map);
+    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
     mapFragment.getMapAsync(this);
   }
 

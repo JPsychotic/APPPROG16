@@ -263,7 +263,10 @@ class GarageManager
           @Override
           public void run()
           {
-            Toast.makeText(context, R.string.noInternet, Toast.LENGTH_SHORT).show();
+            for (int i=0; i < 2; i++)
+            {
+              Toast.makeText(context, R.string.noInternet, Toast.LENGTH_LONG).show();
+            }
           }
         });
       }
