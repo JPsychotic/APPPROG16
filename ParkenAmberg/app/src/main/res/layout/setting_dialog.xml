@@ -64,7 +64,7 @@
                      android:checked="true"/>
     </RadioGroup>
 </RelativeLayout>
-    <Button android:id="@+id/swttingsCloseButton"
+    <Button android:id="@+id/settingsCloseButton"
             android:layout_below="@id/radiobtn_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

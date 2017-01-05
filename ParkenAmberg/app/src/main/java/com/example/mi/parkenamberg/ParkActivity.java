@@ -111,14 +111,69 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
           mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         break;
       }
+      case R.id.favorite:
+      {
+        openFavoriteMenu();
+        break;
+      }
       case R.id.settings:
       {
         openSettingsMenu();
+        break;
       }
       default:
         break;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void openFavoriteMenu()
+  {
+    final Dialog dialog = new Dialog(ParkActivity.this);
+    dialog.setContentView(R.layout.favorite_dialog);
+    dialog.setTitle(R.string.FavoritenMenuTitle);
+    dialog.setCancelable(true);
+
+    //set up button
+    Button button = (Button) dialog.findViewById(R.id.favosCloseButton);
+    button.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        dialog.dismiss();
+      }
+    });
+
+    Switch sw1 = (Switch) dialog.findViewById(R.id.parkhaus1Switch);
+    Switch sw2 = (Switch) dialog.findViewById(R.id.parkhaus2Switch);
+    Switch sw3 = (Switch) dialog.findViewById(R.id.parkhaus3Switch);
+    Switch sw4 = (Switch) dialog.findViewById(R.id.parkhaus4Switch);
+    Switch sw5 = (Switch) dialog.findViewById(R.id.parkhaus5Switch);
+    Switch sw6 = (Switch) dialog.findViewById(R.id.parkhaus6Switch);
+    Switch sw7 = (Switch) dialog.findViewById(R.id.parkhaus7Switch);
+    Switch sw8 = (Switch) dialog.findViewById(R.id.parkhaus8Switch);
+
+    CompoundButton.OnCheckedChangeListener handler = new CompoundButton.OnCheckedChangeListener()
+    {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+      {
+        String tag = buttonView.getTag().toString();
+        Toast.makeText(getApplicationContext(), "Parkhaus "+tag+" als Favorit " + (isChecked ? "hinzugefügt" : "entfernt"), Toast.LENGTH_SHORT).show();
+        // do something, the isChecked will be
+        // true if the switch is in the On position
+      }
+    };
+
+    sw1.setOnCheckedChangeListener(handler);
+    sw2.setOnCheckedChangeListener(handler);
+    sw3.setOnCheckedChangeListener(handler);
+    sw4.setOnCheckedChangeListener(handler);
+    sw5.setOnCheckedChangeListener(handler);
+    sw6.setOnCheckedChangeListener(handler);
+    sw7.setOnCheckedChangeListener(handler);
+    sw8.setOnCheckedChangeListener(handler);
+
+    dialog.show();
   }
 
   private void openSettingsMenu()
@@ -129,7 +184,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.setCancelable(true);
 
     //set up button
-    Button button = (Button) dialog.findViewById(R.id.swttingsCloseButton);
+    Button button = (Button) dialog.findViewById(R.id.settingsCloseButton);
     button.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
