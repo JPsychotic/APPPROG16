@@ -135,15 +135,6 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.setTitle(R.string.FavoritenMenuTitle);
     dialog.setCancelable(true);
 
-    //set up button
-    Button button = (Button) dialog.findViewById(R.id.favosCloseButton);
-    button.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        dialog.dismiss();
-      }
-    });
-
     Switch sw1 = (Switch) dialog.findViewById(R.id.parkhaus1Switch);
     sw1.setChecked(garageManager.GetGarageById(1).getShow());
     Switch sw2 = (Switch) dialog.findViewById(R.id.parkhaus2Switch);
@@ -205,6 +196,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.show();
   }
 
+  private boolean showOnlyFavos = false;
+
   private void openSettingsMenu()
   {
     final Dialog dialog = new Dialog(ParkActivity.this);
@@ -212,29 +205,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.setTitle(R.string.settingsTitle);
     dialog.setCancelable(true);
 
-    //set up button
-    Button button = (Button) dialog.findViewById(R.id.settingsCloseButton);
-    button.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        dialog.dismiss();
-      }
-    });
-
-    RadioGroup radioGroup = (RadioGroup) dialog.findViewById(R.id.radio_buttons1);
-    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-    {
-      public void onCheckedChanged(RadioGroup group, int checkedId) {
-        // checkedId is the RadioButton selected
-        // do something useful
-        View radioButton = group.findViewById(checkedId);
-        int idx = group.indexOfChild(radioButton);
-        Toast.makeText(getApplicationContext(), "option selected: " + idx, Toast.LENGTH_SHORT).show();
-      }
-    });
-
     Switch sw = (Switch) dialog.findViewById(R.id.sprachausgabeSwitch);
     sw.setChecked(sprachausgabe);
+
+    Switch sw2 = (Switch) dialog.findViewById(R.id.onlyfavosSwitch);
+    sw.setChecked(showOnlyFavos);
 
     sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
     {
@@ -242,10 +217,25 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
       {
         Toast.makeText(getApplicationContext(), "Sprachausgabe " + ( isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
-        // do something, the isChecked will be
-        // true if the switch is in the On position
-
         sprachausgabe = isChecked;
+      }
+    });
+
+    sw2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+    {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+      {
+        Toast.makeText(getApplicationContext(), "Zeige nur Favoriten " + ( isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
+        showOnlyFavos = isChecked;
+        if(showOnlyFavos)
+        {
+         // TODO
+        }
+        else
+        {
+          // TODO
+        }
       }
     });
 

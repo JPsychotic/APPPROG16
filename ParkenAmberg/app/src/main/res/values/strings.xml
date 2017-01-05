@@ -17,6 +17,14 @@
     <string name="address5">Regensburger Str. 1, 92224 Amberg</string>
     <string name="address6">Schießstätteweg 8, 92224 Amberg</string>
     <string name="address7">Kaiser-Ludwig-Ring 2, 92224 Amberg</string>
+    <string name="address0short">Ernst-Michl-Platz</string>
+    <string name="address1short">Mühlgasse 5</string>
+    <string name="address2short">Sulzbacher Str. 2</string>
+    <string name="address3short">Pfalzgrafenring 3</string>
+    <string name="address4short">Kurfürstenring 2</string>
+    <string name="address5short">Regensburger Str. 1</string>
+    <string name="address6short">Schießstätteweg 8</string>
+    <string name="address7short">Kaiser-Ludwig-Ring 2</string>
     <string name="userposition">Aktuelle Position</string>
     <string name="favourites">Favoriten</string>
     <string name="maptype">Kartentyp ändern</string>
