@@ -21,4 +21,6 @@
     <string name="favourites">Favoriten</string>
     <string name="maptype">Kartentyp ändern</string>
     <string name="noInternet">Keine Internetverbindung</string>
+    <string name="settings">Einstellungen</string>
+    <string name="settingsTitle">Einstellungen</string>
 </resources>

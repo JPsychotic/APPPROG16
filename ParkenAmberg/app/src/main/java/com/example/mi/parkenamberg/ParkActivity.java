@@ -1,6 +1,7 @@
 package com.example.mi.parkenamberg;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +21,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -105,10 +111,57 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
           mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         break;
       }
+      case R.id.settings:
+      {
+        openSettingsMenu();
+      }
       default:
         break;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void openSettingsMenu()
+  {
+    final Dialog dialog = new Dialog(ParkActivity.this);
+    dialog.setContentView(R.layout.setting_dialog);
+    dialog.setTitle(R.string.settingsTitle);
+    dialog.setCancelable(true);
+
+    //set up button
+    Button button = (Button) dialog.findViewById(R.id.swttingsCloseButton);
+    button.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        dialog.dismiss();
+      }
+    });
+
+    RadioGroup radioGroup = (RadioGroup) dialog.findViewById(R.id.radio_buttons1);
+    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+    {
+      public void onCheckedChanged(RadioGroup group, int checkedId) {
+        // checkedId is the RadioButton selected
+        // do something useful
+        View radioButton = group.findViewById(checkedId);
+        int idx = group.indexOfChild(radioButton);
+        Toast.makeText(getApplicationContext(), "option selected: " + idx, Toast.LENGTH_SHORT).show();
+      }
+    });
+
+    Switch sw = (Switch) dialog.findViewById(R.id.sprachausgabeSwitch);
+    sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+    {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+      {
+        Toast.makeText(getApplicationContext(), "Sprachausgabe " + ( isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
+        // do something, the isChecked will be
+        // true if the switch is in the On position
+      }
+    });
+
+    dialog.show();
   }
 
   @Override

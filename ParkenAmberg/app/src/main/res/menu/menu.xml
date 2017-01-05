@@ -3,5 +3,7 @@
     <item android:id="@+id/help"
         android:title="@string/favourites" />
     <item android:id="@+id/maptype"
-        android:title="@string/maptype" />
+          android:title="@string/maptype" />
+    <item android:id="@+id/settings"
+          android:title="@string/settings" />
 </menu>
