@@ -112,6 +112,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
           mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         break;
       }
+      case R.id.favoriteSubMenu:
       {
         openFavoriteMenu();
         break;
