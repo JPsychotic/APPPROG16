@@ -4,7 +4,7 @@
         android:title="@string/favourites" />
     <item android:id="@+id/maptype"
           android:title="@string/maptype" />
-    <item android:id="@+id/favorite"
+    <item android:id="@+id/favoriteSubMenu"
           android:title="Favoriten" />
     <item android:id="@+id/settings"
           android:title="@string/settings" />

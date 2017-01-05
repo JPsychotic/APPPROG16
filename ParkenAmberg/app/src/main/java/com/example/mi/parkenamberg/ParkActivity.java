@@ -51,6 +51,7 @@ import java.util.Locale;
 public class ParkActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
   GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, ResultCallback<Status>
 {
+  private boolean sprachausgabe = true;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -111,7 +112,6 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
           mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         break;
       }
-      case R.id.favorite:
       {
         openFavoriteMenu();
         break;
@@ -144,13 +144,21 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     });
 
     Switch sw1 = (Switch) dialog.findViewById(R.id.parkhaus1Switch);
+    sw1.setChecked(garageManager.GetGarageById(1).getShow());
     Switch sw2 = (Switch) dialog.findViewById(R.id.parkhaus2Switch);
+    sw2.setChecked(garageManager.GetGarageById(2).getShow());
     Switch sw3 = (Switch) dialog.findViewById(R.id.parkhaus3Switch);
+    sw3.setChecked(garageManager.GetGarageById(3).getShow());
     Switch sw4 = (Switch) dialog.findViewById(R.id.parkhaus4Switch);
+    sw4.setChecked(garageManager.GetGarageById(4).getShow());
     Switch sw5 = (Switch) dialog.findViewById(R.id.parkhaus5Switch);
+    sw5.setChecked(garageManager.GetGarageById(5).getShow());
     Switch sw6 = (Switch) dialog.findViewById(R.id.parkhaus6Switch);
+    sw6.setChecked(garageManager.GetGarageById(6).getShow());
     Switch sw7 = (Switch) dialog.findViewById(R.id.parkhaus7Switch);
+    sw7.setChecked(garageManager.GetGarageById(7).getShow());
     Switch sw8 = (Switch) dialog.findViewById(R.id.parkhaus8Switch);
+    sw8.setChecked(garageManager.GetGarageById(8).getShow());
 
     CompoundButton.OnCheckedChangeListener handler = new CompoundButton.OnCheckedChangeListener()
     {
@@ -161,6 +169,26 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
         Toast.makeText(getApplicationContext(), "Parkhaus "+tag+" als Favorit " + (isChecked ? "hinzugefügt" : "entfernt"), Toast.LENGTH_SHORT).show();
         // do something, the isChecked will be
         // true if the switch is in the On position
+
+        Garage g = garageManager.GetGarageById(Integer.parseInt(tag));
+        g.setShow(isChecked);
+
+        //Marker entfernen bzw. hinzufügen
+        if(isChecked)
+        {
+          markers.add(mMap.addMarker(new MarkerOptions().position(g.getLocation()).title(g.getName()).icon(GetIconForGarage(g)).snippet(GetSnippetForGarage(g))));
+        }
+        else
+        {
+          for(Marker m: markers)
+          {
+            if(m.getTitle().equals(g.getName())) {
+              markers.remove(m);
+              m.remove();
+              break;
+            }
+          }
+        }
       }
     };
 
@@ -205,6 +233,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     });
 
     Switch sw = (Switch) dialog.findViewById(R.id.sprachausgabeSwitch);
+    sw.setChecked(sprachausgabe);
+
     sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
     {
       @Override
@@ -213,6 +243,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
         Toast.makeText(getApplicationContext(), "Sprachausgabe " + ( isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         // do something, the isChecked will be
         // true if the switch is in the On position
+
+        sprachausgabe = isChecked;
       }
     });
 
@@ -247,6 +279,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   // Google Map methods and variables
   private GoogleMap mMap;
   public Boolean gAPIConnected = false;
+  private boolean trackPosition = false;
   private GarageManager garageManager;
   private LocationManager locationManager;
   private String provider;
@@ -255,7 +288,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   //Zeit in ms nach der ein Location-Update durchgeführt wird
   private final int locationUpdateInterval = 5000;
   //Distanz nach der ein location-Update durchgeführt wird
-  private final int locationUpdateDistance = 1;
+  private final int locationUpdateDistance = 10;
   //Ca. Mittelpunkt vom Ring
   private final LatLng locationAmberg = new LatLng(49.445002, 11.857240);
 
@@ -275,6 +308,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
 
     SetMarkerOnMap();
+    geofences.add(GetAmbergGeofence(locationAmberg, 0));
     AddGeofences();
 
     GarageManager.UpdateFinishedCallback callback = new GarageManager.UpdateFinishedCallback()
@@ -317,7 +351,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   {
     public void onLocationChanged(Location location)
     {
-      if(mMap != null) {
+      if(mMap != null && trackPosition) {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
 
         if(userPos == null) {
@@ -443,6 +477,17 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       .setCircularRegion(position.latitude, position.longitude, GEOFENCE_RADIUS)
       .setExpirationDuration(Geofence.NEVER_EXPIRE)
       .build();
+  }
+
+  private Geofence GetAmbergGeofence(LatLng position, int id)
+  {
+    String strid = "Geofence" + id;
+    return new Geofence.Builder()
+            .setRequestId(strid)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+            .setCircularRegion(position.latitude, position.longitude, 2000f)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .build();
   }
 
   /**
@@ -584,12 +629,20 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       String[] triggeredGarages = ids.split(";");
 
       for (String i: triggeredGarages) {
+        if(i.equals("0")) {
+          //Position tracken
+          trackPosition = true;
+          continue;
+        }
+
         Garage g = garageManager.GetGarageById(Integer.parseInt(i));
-        if(g != null) {
+        if(g != null && g.getShow()) {
           String resultMessage = createResultMessage(g);
           Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show();
           //Deprecated after API 21 or sth like that, but LG Fino uses API 19
-          resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
+
+          if(sprachausgabe)
+            resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
         }
       }
     }

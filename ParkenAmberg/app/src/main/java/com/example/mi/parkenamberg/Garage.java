@@ -11,6 +11,7 @@ public class Garage {
     private int id;
     private LatLng location;
     public boolean closed = false;
+    private boolean show;
 
     private String name;
     private int maxPlaetze;
@@ -37,6 +38,7 @@ public class Garage {
         if(l != null) location = l;
         name = n;
         this.id = id;
+        show = true;
     }
 
     LatLng getLocation() {
@@ -50,5 +52,9 @@ public class Garage {
     public int getId() {
         return id;
     }
+
+    public void setShow(boolean s) { show = s; }
+
+    public boolean getShow() { return show; }
 
 }
