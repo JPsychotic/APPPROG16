@@ -54,6 +54,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, ResultCallback<Status>
 {
   private boolean sprachausgabe = true;
+  private boolean isBackground = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -211,6 +212,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   private boolean showOnlyFavos = false;
+  private boolean enableBackgroundSpeech = false;
 
   private void openSettingsMenu()
   {
@@ -224,6 +226,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
 
     Switch sw2 = (Switch) dialog.findViewById(R.id.onlyfavosSwitch);
     sw2.setChecked(showOnlyFavos);
+
+    Switch sw3 = (Switch) dialog.findViewById(R.id.enableBackgroundSpeech);
+    sw3.setChecked(enableBackgroundSpeech);
 
     sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
     {
@@ -263,6 +268,16 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       }
     });
 
+    sw3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+    {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+      {
+        Toast.makeText(getApplicationContext(), "Hintergrundprachausgabe " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
+        enableBackgroundSpeech = isChecked;
+      }
+    });
+
     dialog.show();
   }
 
@@ -270,7 +285,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   protected void onStart()
   {
     super.onStart();
-
+    isBackground = false;
     // Call GoogleApiClient connection when starting the Activity
     googleApiClient.connect();
   }
@@ -279,7 +294,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   protected void onStop()
   {
     super.onStop();
-
+    isBackground = true;
     // Disconnect GoogleApiClient when stopping Activity
     gAPIConnected = false;
     googleApiClient.disconnect();
@@ -674,7 +689,10 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
 
           if (sprachausgabe)
           {
-            resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
+            if (isBackground && enableBackgroundSpeech || !isBackground)
+            {
+              resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
+            }
           }
         }
       }

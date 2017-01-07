@@ -26,5 +26,14 @@
             android:enabled="true"
             android:text="Nur Favoriten anzeigen"
             android:checked="true"/>
+        <Switch
+            android:id="@+id/enableBackgroundSpeech"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:switchMinWidth="0dp"
+            android:layout_marginBottom="20dp"
+            android:enabled="true"
+            android:text="Hintergrundsprachausgabe aktivieren"
+            android:checked="true"/>
     </LinearLayout>
 </RelativeLayout>
