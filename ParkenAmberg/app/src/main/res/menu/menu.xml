@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/homeButton"
+          android:title="Zurück nach Amberg" />
     <item android:id="@+id/maptype"
           android:title="@string/maptype" />
     <item android:id="@+id/favoriteSubMenu"

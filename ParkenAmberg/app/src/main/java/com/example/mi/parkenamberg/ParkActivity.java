@@ -132,6 +132,13 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
         openSettingsMenu();
         break;
       }
+      case R.id.homeButton:
+      {
+        if(mMap == null) break;
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(locationAmberg));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
+        break;
+      }
       default:
         break;
     }
