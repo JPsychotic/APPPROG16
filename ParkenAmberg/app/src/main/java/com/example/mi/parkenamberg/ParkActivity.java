@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -181,6 +182,12 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Garage g = garageManager.GetGarageById(Integer.parseInt(tag));
         g.setShow(isChecked);
+
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(g.getName(), isChecked);
+        editor.commit();
+
         if (!showOnlyFavos)
         {
           return;

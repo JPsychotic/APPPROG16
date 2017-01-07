@@ -1,5 +1,7 @@
 package com.example.mi.parkenamberg;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -51,12 +53,24 @@ class GarageManager
       @Override
       public void run()
       {
-        Log.d("GarageManager","Update running...");
+        Log.d("GarageManager", "Update running...");
         Update();
         internalUpdateHandler.postDelayed(this, 60000);
       }
     };
     internalUpdateHandler.postDelayed(runnable, 10000);
+
+    loadSettings();
+  }
+
+  private void loadSettings()
+  {
+    SharedPreferences settings = context.getPreferences(Context.MODE_PRIVATE);
+
+    for (Garage g : garages)
+    {
+      g.setShow(settings.getBoolean(g.getName(), false));
+    }
   }
 
   interface UpdateFinishedCallback
@@ -254,8 +268,7 @@ class GarageManager
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         doc = builder.parse(conn.getInputStream());
-      }
-      catch (Exception e)
+      } catch (Exception e)
       {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable()
@@ -263,7 +276,7 @@ class GarageManager
           @Override
           public void run()
           {
-            for (int i=0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
             {
               Toast.makeText(context, R.string.noInternet, Toast.LENGTH_LONG).show();
             }
