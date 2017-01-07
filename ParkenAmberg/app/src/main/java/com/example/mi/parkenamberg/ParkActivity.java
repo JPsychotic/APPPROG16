@@ -44,7 +44,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -94,7 +96,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
+  public boolean onCreateOptionsMenu(Menu menu)
+  {
     MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.menu, menu);
 
@@ -102,14 +105,20 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
+  public boolean onOptionsItemSelected(MenuItem item)
+  {
+    switch (item.getItemId())
+    {
       case R.id.maptype:
       {
-        if(mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL)
+        if (mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL)
+        {
           mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
         else
+        {
           mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
         break;
       }
       case R.id.favoriteSubMenu:
@@ -158,23 +167,28 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
       {
         String tag = buttonView.getTag().toString();
-        Toast.makeText(getApplicationContext(), "Parkhaus "+tag+" als Favorit " + (isChecked ? "hinzugefügt" : "entfernt"), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Parkhaus " + tag + " als Favorit " + (isChecked ? "hinzugefügt" : "entfernt"), Toast.LENGTH_SHORT).show();
         // do something, the isChecked will be
         // true if the switch is in the On position
 
         Garage g = garageManager.GetGarageById(Integer.parseInt(tag));
         g.setShow(isChecked);
+        if (!showOnlyFavos)
+        {
+          return;
+        }
 
         //Marker entfernen bzw. hinzufügen
-        if(isChecked)
+        if (isChecked)
         {
           markers.add(mMap.addMarker(new MarkerOptions().position(g.getLocation()).title(g.getName()).icon(GetIconForGarage(g)).snippet(GetSnippetForGarage(g))));
         }
         else
         {
-          for(Marker m: markers)
+          for (Marker m : markers)
           {
-            if(m.getTitle().equals(g.getName())) {
+            if (m.getTitle().equals(g.getName()))
+            {
               markers.remove(m);
               m.remove();
               break;
@@ -209,32 +223,42 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     sw.setChecked(sprachausgabe);
 
     Switch sw2 = (Switch) dialog.findViewById(R.id.onlyfavosSwitch);
-    sw.setChecked(showOnlyFavos);
+    sw2.setChecked(showOnlyFavos);
 
     sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
     {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
       {
-        Toast.makeText(getApplicationContext(), "Sprachausgabe " + ( isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Sprachausgabe " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         sprachausgabe = isChecked;
       }
     });
+
 
     sw2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
     {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
       {
-        Toast.makeText(getApplicationContext(), "Zeige nur Favoriten " + ( isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Zeige nur Favoriten " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         showOnlyFavos = isChecked;
-        if(showOnlyFavos)
+
+        Iterator<Marker> iter = markers.iterator();
+        while (iter.hasNext())
         {
-         // TODO
+          Marker str = iter.next();
+
+          iter.remove();
+          str.remove();
         }
-        else
+
+        for (Garage g : garageManager.GetGarages())
         {
-          // TODO
+          if (!showOnlyFavos || g.getShow())
+          {
+            markers.add(mMap.addMarker(new MarkerOptions().position(g.getLocation()).title(g.getName()).icon(GetIconForGarage(g)).snippet(GetSnippetForGarage(g))));
+          }
         }
       }
     });
@@ -262,7 +286,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   @Override
-  public void onDestroy() {
+  public void onDestroy()
+  {
     this.unregisterReceiver(receiver);
     super.onDestroy();
   }
@@ -342,18 +367,20 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   {
     public void onLocationChanged(Location location)
     {
-      if(mMap != null && trackPosition) {
+      if (mMap != null && trackPosition)
+      {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
 
-        if(userPos == null) {
+        if (userPos == null)
+        {
           BitmapDescriptor icon;
           icon = BitmapDescriptorFactory.fromResource(R.drawable.pos);
 
           userPos = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude()))
-                  .title(getString(R.string.userposition))
-                  .icon(icon));
+            .title(getString(R.string.userposition)).icon(icon));
         }
-        else {
+        else
+        {
           userPos.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
         }
       }
@@ -361,6 +388,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onProviderDisabled(String provider)
     {
+      Toast.makeText(getApplicationContext(), "GPS Signal verloren", Toast.LENGTH_LONG).show();
     }
 
     public void onProviderEnabled(String provider)
@@ -474,11 +502,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   {
     String strid = "Geofence" + id;
     return new Geofence.Builder()
-            .setRequestId(strid)
-            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-            .setCircularRegion(position.latitude, position.longitude, 2000f)
-            .setExpirationDuration(Geofence.NEVER_EXPIRE)
-            .build();
+      .setRequestId(strid)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+      .setCircularRegion(position.latitude, position.longitude, 2000f)
+      .setExpirationDuration(Geofence.NEVER_EXPIRE)
+      .build();
   }
 
   /**
@@ -552,9 +580,10 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     gAPIConnected = true;
     AddGeofences();
   }
+
   void AddGeofences()
   {
-    if(!geofences.isEmpty() && gAPIConnected)
+    if (!geofences.isEmpty() && gAPIConnected)
     {
       GeofencingRequest geofenceRequest = createGeofenceRequest(geofences);
       addGeofence(geofenceRequest);
@@ -592,9 +621,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   //TextToSpeech API
   TextToSpeech resultSpeaker;
 
-  TextToSpeech.OnInitListener TTSOnInitListener = new TextToSpeech.OnInitListener() {
+  TextToSpeech.OnInitListener TTSOnInitListener = new TextToSpeech.OnInitListener()
+  {
     @Override
-    public void onInit(int status) {
+    public void onInit(int status)
+    {
       resultSpeaker.setLanguage(Locale.GERMANY);
     }
   };
@@ -605,35 +636,46 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   /**
    * Class to receive the Broadcast from the GeofenceTransitionService
    */
-  public class GeofenceResponseReceiver extends BroadcastReceiver {
+  public class GeofenceResponseReceiver extends BroadcastReceiver
+  {
     public static final String GEOFENCE_RESPONSE = "Geofence_Response_Message";
 
-    public GeofenceResponseReceiver() {
+    public GeofenceResponseReceiver()
+    {
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
       String ids = intent.getStringExtra(GeofenceTransitionService.GEOFENCE_SERVICE_ID);
 
-      if(ids == null) return;
+      if (ids == null)
+      {
+        return;
+      }
 
       String[] triggeredGarages = ids.split(";");
 
-      for (String i: triggeredGarages) {
-        if(i.equals("0")) {
+      for (String i : triggeredGarages)
+      {
+        if (i.equals("0"))
+        {
           //Position tracken
           trackPosition = true;
           continue;
         }
 
         Garage g = garageManager.GetGarageById(Integer.parseInt(i));
-        if(g != null && g.getShow()) {
+        if (g != null && g.getShow())
+        {
           String resultMessage = createResultMessage(g);
           Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show();
           //Deprecated after API 21 or sth like that, but LG Fino uses API 19
 
-          if(sprachausgabe)
+          if (sprachausgabe)
+          {
             resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
+          }
         }
       }
     }
@@ -643,21 +685,27 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
      *
      * @param g the Garage which is near the user's position.
      * @return the message
-       */
-    private String createResultMessage(Garage g) {
+     */
+    private String createResultMessage(Garage g)
+    {
       String msg = "Das Parkhaus " + g.getName() + " befindet sich in ihrer Nähe.";
 
       //Falls Geschlossen...
-      if(g.closed) {
+      if (g.closed)
+      {
         msg += " Das Parkhaus ist leider geschlossen.";
         return msg;
       }
 
       //Freie Parkplätze ausgeben
-      if(g.getMaxPlaetze() - g.getCurPlaetze() > 0)
+      if (g.getMaxPlaetze() - g.getCurPlaetze() > 0)
+      {
         msg += " Es sind " + g.getCurPlaetze() + " Parkplätze frei.";
+      }
       else
+      {
         msg += " Leider sind keine Parkplätze frei.";
+      }
 
       return msg;
     }
