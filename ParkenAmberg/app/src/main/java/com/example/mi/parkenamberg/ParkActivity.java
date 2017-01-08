@@ -186,7 +186,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(g.getName(), isChecked);
-        editor.commit();
+        editor.apply();
 
         if (!showOnlyFavos)
         {
@@ -251,6 +251,10 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       {
         Toast.makeText(getApplicationContext(), "Sprachausgabe " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         sprachausgabe = isChecked;
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("sprachausgabe", sprachausgabe);
+        editor.apply();
       }
     });
 
@@ -262,23 +266,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       {
         Toast.makeText(getApplicationContext(), "Zeige nur Favoriten " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         showOnlyFavos = isChecked;
-
-        Iterator<Marker> iter = markers.iterator();
-        while (iter.hasNext())
-        {
-          Marker str = iter.next();
-
-          iter.remove();
-          str.remove();
-        }
-
-        for (Garage g : garageManager.GetGarages())
-        {
-          if (!showOnlyFavos || g.getShow())
-          {
-            markers.add(mMap.addMarker(new MarkerOptions().position(g.getLocation()).title(g.getName()).icon(GetIconForGarage(g)).snippet(GetSnippetForGarage(g))));
-          }
-        }
+        setShowOnlyFavos(showOnlyFavos);
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("showOnlyFavos", showOnlyFavos);
+        editor.apply();
       }
     });
 
@@ -289,10 +281,43 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       {
         Toast.makeText(getApplicationContext(), "Hintergrundprachausgabe " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         enableBackgroundSpeech = isChecked;
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("enableBackgroundSpeech", enableBackgroundSpeech);
+        editor.apply();
       }
     });
 
     dialog.show();
+  }
+
+  private void setShowOnlyFavos(boolean b)
+  {
+    Iterator<Marker> iter = markers.iterator();
+    while (iter.hasNext())
+    {
+      Marker str = iter.next();
+
+      iter.remove();
+      str.remove();
+    }
+
+    for (Garage g : garageManager.GetGarages())
+    {
+      if (!showOnlyFavos || g.getShow())
+      {
+        markers.add(mMap.addMarker(new MarkerOptions().position(g.getLocation()).title(g.getName()).icon(GetIconForGarage(g)).snippet(GetSnippetForGarage(g))));
+      }
+    }
+  }
+
+  private void loadSettings()
+  {
+    SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+    sprachausgabe = settings.getBoolean("sprachausgabe", false);
+    showOnlyFavos = settings.getBoolean("showOnlyFavos", false);
+    enableBackgroundSpeech = settings.getBoolean("enableBackgroundSpeech", false);
+    setShowOnlyFavos(showOnlyFavos);
   }
 
   @Override
@@ -373,6 +398,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     };
     garageManager.UpdateCallback = callback;
     garageManager.Update();
+    loadSettings();
   }
 
   void SetMarkerOnMap()
