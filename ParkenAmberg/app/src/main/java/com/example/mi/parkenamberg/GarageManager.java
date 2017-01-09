@@ -153,10 +153,11 @@ class GarageManager
         if (idNodes.getLength() > 0)
         {
           int id = Integer.parseInt(idNodes.item(0).getFirstChild().getNodeValue());
-          NodeList currentNodes, maxNodes, closedNodes;
+          NodeList currentNodes, maxNodes, closedNodes, trendNodes;
           maxNodes = element.getElementsByTagName("Gesamt");
           currentNodes = element.getElementsByTagName("Aktuell");
           closedNodes = element.getElementsByTagName("Geschlossen");
+          trendNodes = element.getElementsByTagName("Trend");
 
           if (maxNodes.getLength() > 0)
           {
@@ -172,6 +173,11 @@ class GarageManager
           {
             Element closed = (Element) closedNodes.item(0);
             garages[id - 1].closed = Integer.parseInt(closed.getFirstChild().getNodeValue()) != 0;
+          }
+          if(trendNodes.getLength() > 0)
+          {
+            Element trend = (Element) trendNodes.item(0);
+            garages[id - 1].setTrend(Integer.parseInt(trend.getFirstChild().getNodeValue()));
           }
         }
       }

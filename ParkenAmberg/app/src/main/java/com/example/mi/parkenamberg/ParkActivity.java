@@ -527,6 +527,24 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       snippet += "Keine Information";
     }
 
+    snippet += "\nTrend: ";
+
+    int trend = g.getTrend();
+    if(trend == 0)
+    {
+      snippet += "\u2192";
+    }
+    else if(trend == 1)
+    {
+      snippet += "\u2197";
+    }
+    else if(trend == -1)
+    {
+      snippet += "\u2198";
+    }
+    else
+      snippet += "Keine Information.";
+
     return snippet;
   }
 
@@ -547,7 +565,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     String strid = "Geofence" + id;
     return new Geofence.Builder()
       .setRequestId(strid)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
       .setCircularRegion(position.latitude, position.longitude, GEOFENCE_RADIUS)
       .setExpirationDuration(Geofence.NEVER_EXPIRE)
       .build();
@@ -558,7 +576,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     String strid = "Geofence" + id;
     return new Geofence.Builder()
       .setRequestId(strid)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
       .setCircularRegion(position.latitude, position.longitude, 2000f)
       .setExpirationDuration(Geofence.NEVER_EXPIRE)
       .build();
@@ -709,33 +727,55 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
         return;
       }
 
+      boolean enter = false;
       String[] triggeredGarages = ids.split(";");
+
+      if(triggeredGarages.length > 0 && triggeredGarages[0].equals("enter"))
+        enter = true;
 
       for (String i : triggeredGarages)
       {
+        if(i.equals("enter") || i.equals("exit"))
+          continue;
+
         if (i.equals("0"))
         {
-          //Position tracken
-          trackPosition = true;
+          //Position tracking or not
+          trackPosition = enter;
           continue;
         }
 
         Garage g = garageManager.GetGarageById(Integer.parseInt(i));
-        if (g != null && g.getShow())
-        {
+        if (g != null && enter && (!showOnlyFavos || g.getShow())) {
           String resultMessage = createResultMessage(g);
           Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show();
-          //Deprecated after API 21 or sth like that, but LG Fino uses API 19
 
-          if (sprachausgabe)
-          {
-            if (isBackground && enableBackgroundSpeech || !isBackground)
-            {
+          if (sprachausgabe) {
+            if ((isBackground && enableBackgroundSpeech) || !isBackground) {
+              //Deprecated after API 21 or sth like that, but LG Fino uses API 19
               resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
             }
           }
         }
+
+        if(g != null)
+          g.setEntered(enter);
       }
+
+      //Check if any geofence of a garage is entered
+      boolean zoomed = false;
+      for (Garage g: garageManager.GetGarages()) {
+        if(g.getEntered())
+        {
+          //if yes zoom map in...
+          mMap.animateCamera(CameraUpdateFactory.zoomTo(16f));
+          zoomed = true;
+          break;
+        }
+      }
+      //if not zoom out
+      if(!zoomed)
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14f));
     }
 
     /**

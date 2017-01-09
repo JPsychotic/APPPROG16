@@ -50,7 +50,27 @@ public class GeofenceTransitionService extends IntentService {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
             //Create String with ids
-            String geofenceIds = "";
+            String geofenceIds = "enter;";
+            for (Geofence g: triggeringGeofences) {
+                String strid = g.getRequestId();
+                geofenceIds += strid.replace("Geofence", "") + ";";
+            }
+            //Delete the last ;
+            geofenceIds = geofenceIds.substring(0, geofenceIds.length() - 1);
+
+            //send the ids to the activity
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(ParkActivity.GeofenceResponseReceiver.GEOFENCE_RESPONSE);
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra(GEOFENCE_SERVICE_ID, geofenceIds);
+            sendBroadcast(broadcastIntent);
+        }
+        else if(geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            // Get the geofence that were triggered
+            List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
+
+            //Create String with ids
+            String geofenceIds = "exit;";
             for (Geofence g: triggeringGeofences) {
                 String strid = g.getRequestId();
                 geofenceIds += strid.replace("Geofence", "") + ";";
