@@ -300,7 +300,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       {
         Toast.makeText(getApplicationContext(), "Zeige nur Favoriten " + (isChecked ? "aktiviert" : "deaktiviert"), Toast.LENGTH_SHORT).show();
         showOnlyFavos = isChecked;
-        setShowOnlyFavos(showOnlyFavos);
+        setShowOnlyFavos();
         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("showOnlyFavos", showOnlyFavos);
@@ -325,7 +325,10 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.show();
   }
 
-  private void setShowOnlyFavos(boolean b)
+  /**
+   * Shows only the favorites
+   */
+  private void setShowOnlyFavos()
   {
     Iterator<Marker> iter = markers.iterator();
     while (iter.hasNext())
@@ -354,7 +357,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     sprachausgabe = settings.getBoolean("sprachausgabe", false);
     showOnlyFavos = settings.getBoolean("showOnlyFavos", false);
     enableBackgroundSpeech = settings.getBoolean("enableBackgroundSpeech", false);
-    setShowOnlyFavos(showOnlyFavos);
+    setShowOnlyFavos();
   }
 
   /**
@@ -564,8 +567,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     }
     else
     {
-      double besetzt = g.getCurPlaetze() / g.getMaxPlaetze();
-      if (besetzt < 0.9f)
+      double besetzt = (double)g.getCurPlaetze() / (double)g.getMaxPlaetze();
+      if (besetzt < 0.8f)
       {
         icon = BitmapDescriptorFactory.fromResource(R.drawable.garage_free);
       }
@@ -611,7 +614,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   private String GetSnippetForGarage(Garage g)
   {
     String snippet = "Freie Plätze: ";
-    if (g.getMaxPlaetze() > 0)
+    if(g.closed)
+      snippet += "Parkhaus ist geschlossen";
+    else if (g.getMaxPlaetze() > 0)
     {
       snippet += (g.getMaxPlaetze() - g.getCurPlaetze());
     }
