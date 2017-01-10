@@ -51,12 +51,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Main Activity for the application
+ */
 public class ParkActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
   GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, ResultCallback<Status>
 {
+  /**
+   * Variable to check if voice output is enabled
+   */
   private boolean sprachausgabe = true;
+  /**
+   * Variable to check if the app is minimized or not
+   */
   private boolean isBackground = false;
 
+  /**
+   * OnCreate of the Activity
+   * @param savedInstanceState
+     */
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
@@ -72,7 +85,6 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     provider = LocationManager.GPS_PROVIDER;
 
-    //minZeit in ms, minDistance
     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
       && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     {
@@ -97,6 +109,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     mapFragment.getMapAsync(this);
   }
 
+  /**
+   * Creates the options menu
+   * @param menu
+   * @return
+     */
   @Override
   public boolean onCreateOptionsMenu(Menu menu)
   {
@@ -106,6 +123,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     return super.onCreateOptionsMenu(menu);
   }
 
+  /**
+   * OnClick Handler for the options menu
+   * @param item
+   * @return
+     */
   @Override
   public boolean onOptionsItemSelected(MenuItem item)
   {
@@ -146,6 +168,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     return super.onOptionsItemSelected(item);
   }
 
+  /**
+   * Opens the favoritesmenu-overlay
+   */
   private void openFavoriteMenu()
   {
     final Dialog dialog = new Dialog(ParkActivity.this);
@@ -225,9 +250,18 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.show();
   }
 
+  /**
+   * Variable to check if the user wants to display only favorites
+   */
   private boolean showOnlyFavos = false;
+  /**
+   * Variable to check if the user wants background voice output enabled
+   */
   private boolean enableBackgroundSpeech = false;
 
+  /**
+   * Creates the settingsmenu-overlay
+   */
   private void openSettingsMenu()
   {
     final Dialog dialog = new Dialog(ParkActivity.this);
@@ -311,6 +345,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     }
   }
 
+  /**
+   * Loads the saved settings
+   */
   private void loadSettings()
   {
     SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
@@ -320,6 +357,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     setShowOnlyFavos(showOnlyFavos);
   }
 
+  /**
+   * Called when the app is maximized
+   */
   @Override
   protected void onStart()
   {
@@ -329,6 +369,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     googleApiClient.connect();
   }
 
+  /**
+   * Called when the app is minimized
+   */
   @Override
   protected void onStop()
   {
@@ -339,6 +382,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     googleApiClient.disconnect();
   }
 
+  /**
+   * Called when the app is destroyed
+   */
   @Override
   public void onDestroy()
   {
@@ -347,19 +393,49 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   // Google Map methods and variables
+  /**
+   * The Google-Map
+   */
   private GoogleMap mMap;
+  /**
+   * Variable to check if Google-API is connected
+   */
   public Boolean gAPIConnected = false;
+  /**
+   * Variable to check if the user-positions should be tracked
+   */
   private boolean trackPosition = false;
+  /**
+   * The instance of the Garage-Manager
+   */
   private GarageManager garageManager;
+  /**
+   * The LocationManager, which provides the position
+   */
   private LocationManager locationManager;
+  /**
+   * The provider used with the manager
+   */
   private String provider;
+  /**
+   * Marker for the user position
+   */
   private Marker userPos;
+  /**
+   * Markers for the Garages
+   */
   private List<Marker> markers;
-  //Zeit in ms nach der ein Location-Update durchgeführt wird
+  /**
+   * Interval-Time for the location update
+   */
   private final int locationUpdateInterval = 5000;
-  //Distanz nach der ein location-Update durchgeführt wird
+  /**
+   * Distance after which the update is triggered
+   */
   private final int locationUpdateDistance = 10;
-  //Ca. Mittelpunkt vom Ring
+  /**
+   * Position of Amberg
+   */
   private final LatLng locationAmberg = new LatLng(49.445002, 11.857240);
 
   /**
@@ -401,6 +477,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     loadSettings();
   }
 
+  /**
+   * Sets Marker for garages on the map
+   */
   void SetMarkerOnMap()
   {
     // Add a marker for every garage
@@ -416,7 +495,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   /**
-   * Location Listener
+   * Location Listener for the locationManager
    */
   LocationListener locationListener = new LocationListener()
   {
@@ -441,15 +520,29 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       }
     }
 
+    /**
+     * Is triggered when there is no GPS-Signal
+     * @param provider
+       */
     public void onProviderDisabled(String provider)
     {
       Toast.makeText(getApplicationContext(), "GPS Signal verloren", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Triggered when the GPS provider is enabled
+     * @param provider
+       */
     public void onProviderEnabled(String provider)
     {
     }
 
+    /**
+     * Triggered when the status changes
+     * @param provider
+     * @param status
+     * @param extras
+       */
     public void onStatusChanged(String provider, int status, Bundle extras)
     {
     }
@@ -549,9 +642,18 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   // Geofence methods & variables
+  /**
+   * List of geofences for the garages
+   */
   private List<Geofence> geofences;
+  /**
+   * Geofence Intent
+   */
   private PendingIntent geoFencePendingIntent;
   private final int GEOFENCE_REQ_CODE = 0;
+  /**
+   * The radius for the geofence of the garages
+   */
   private final float GEOFENCE_RADIUS = 250.0f;
 
   /**
@@ -571,6 +673,12 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       .build();
   }
 
+  /**
+   * Returns the Geofence for Amberg
+   * @param position Position
+   * @param id Id of this Geofence
+   * @return the Geofence
+     */
   private Geofence GetAmbergGeofence(LatLng position, int id)
   {
     String strid = "Geofence" + id;
@@ -583,7 +691,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   /**
-   * Creates aGeofenceRequest
+   * Creates a GeofenceRequest
    *
    * @param geofences
    * @return the GeofencingRequest
@@ -644,8 +752,15 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   // Google API methods & variables
+  /**
+   * Variable for the Google API-client
+   */
   private GoogleApiClient googleApiClient;
 
+  /**
+   * Triggered when the Google API client is connected
+   * @param bundle
+     */
   @Override
   public void onConnected(@Nullable Bundle bundle)
   {
@@ -654,6 +769,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     AddGeofences();
   }
 
+  /**
+   * Starts the Geofence Monitoring
+   */
   void AddGeofences()
   {
     if (!geofences.isEmpty() && gAPIConnected)
@@ -663,12 +781,20 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     }
   }
 
+  /**
+   * Triggered when the Google API connection is suspended
+   * @param i
+     */
   @Override
   public void onConnectionSuspended(int i)
   {
     Log.d("GoogleAPI", "onConnectionSuspended()");
   }
 
+  /**
+   * Triggered if the google API connection failed
+   * @param connectionResult
+     */
   @Override
   public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
   {
@@ -692,8 +818,14 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   }
 
   //TextToSpeech API
+  /**
+   * Text to speech instance
+   */
   TextToSpeech resultSpeaker;
 
+  /**
+   * OnInitListener for the Text to speech instance
+   */
   TextToSpeech.OnInitListener TTSOnInitListener = new TextToSpeech.OnInitListener()
   {
     @Override
@@ -704,6 +836,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   };
 
   //Broadcast Receiver
+  /**
+   * Broadcast Receiver for the broadcats of the GeofenceTransitionService
+   */
   private GeofenceResponseReceiver receiver;
 
   /**
@@ -711,12 +846,23 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
    */
   public class GeofenceResponseReceiver extends BroadcastReceiver
   {
+    /**
+     * Geofence Response identifier string
+     */
     public static final String GEOFENCE_RESPONSE = "Geofence_Response_Message";
 
+    /**
+     * Constructor
+     */
     public GeofenceResponseReceiver()
     {
     }
 
+    /**
+     * Triggered when a Broadcast is received
+     * @param context
+     * @param intent
+       */
     @Override
     public void onReceive(Context context, Intent intent)
     {

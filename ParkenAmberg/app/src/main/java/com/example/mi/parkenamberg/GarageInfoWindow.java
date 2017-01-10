@@ -14,11 +14,28 @@ import java.util.List;
  * Created by Jeremy on 22.12.2016.
  */
 
+/**
+ * Custom InfoWindow for the map
+ */
 public class GarageInfoWindow implements GoogleMap.InfoWindowAdapter {
+    /**
+     * Context
+     */
     private Context context;
+    /**
+     * the used view
+     */
     private final View markerview;
+    /**
+     * GarageManager
+     */
     private GarageManager garageManager;
 
+    /**
+     * Constructor
+     * @param c context
+     * @param gm GarageManager
+     */
     public GarageInfoWindow(Context c, GarageManager gm) {
         garageManager = gm;
         context = c;
@@ -38,12 +55,17 @@ public class GarageInfoWindow implements GoogleMap.InfoWindowAdapter {
         return markerview;
     }
 
+    /**
+     * Called when the view gets rendered
+     * @param marker the marker for this info window
+     */
     private void render(Marker marker) {
         TextView title = (TextView) markerview.findViewById(R.id.title);
         TextView snippet = (TextView) markerview.findViewById(R.id.snippet);
 
         Garage g = garageManager.GetGarageByName(marker.getTitle());
 
+        //Set Snippet and Title
         title.setText(g.getName());
         snippet.setText(marker.getSnippet());
     }

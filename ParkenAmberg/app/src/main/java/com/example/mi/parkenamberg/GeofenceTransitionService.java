@@ -19,17 +19,36 @@ import java.util.List;
  * Created by Jeremy on 07.12.2016.
  */
 
+/**
+ * Class which receives the geofence notifications
+ */
 public class GeofenceTransitionService extends IntentService {
 
+    /**
+     * Tag for Console Outputs
+     */
     private static final String TAG = GeofenceTransitionService.class.getSimpleName();
+    /**
+     * String to identify the responses which this class sends
+     */
     public static final String GEOFENCE_SERVICE_ID = "Geofence_Transition_Service";
+    /**
+     * Handler for the main activity
+     */
     private Handler mainHandle;
 
+    /**
+     * Constructor
+     */
     public GeofenceTransitionService() {
         super(TAG);
         mainHandle = new Handler(Looper.getMainLooper());
     }
 
+    /**
+     * Triggered when the geofence notification is received
+     * @param intent
+     */
     @Override
     protected void onHandleIntent(Intent intent) {
         // Retrieve the Geofencing intent
@@ -87,7 +106,11 @@ public class GeofenceTransitionService extends IntentService {
         }
     }
 
-    // Handle errors
+    /**
+     * Handles the errors of this class
+     * @param errorCode
+     * @return the error message
+     */
     private static String getErrorString(int errorCode) {
         switch (errorCode) {
             case GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE:
