@@ -907,9 +907,14 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
               resultSpeaker.speak(resultMessage, TextToSpeech.QUEUE_ADD, null);
             }
           }
+
+          //Set Entered only true, if Garage is entered
+          if(g != null)
+            g.setEntered(enter);
         }
 
-        if(g != null)
+        //Set Entered to false for every garage
+        if(g != null && !enter)
           g.setEntered(enter);
       }
 
@@ -947,9 +952,13 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       }
 
       //Freie Parkplätze ausgeben
-      if (g.getMaxPlaetze() - g.getCurPlaetze() > 0)
+      if(g.getMaxPlaetze() <= 0)
       {
-        msg += " Es sind " + g.getCurPlaetze() + " Parkplätze frei.";
+        msg += " Es sind keine Informationen über die Parkplätze verfügbar.";
+      }
+      else if (g.getMaxPlaetze() - g.getCurPlaetze() > 0)
+      {
+        msg += " Es sind " + (g.getMaxPlaetze() - g.getCurPlaetze()) + " Parkplätze frei.";
       }
       else
       {
