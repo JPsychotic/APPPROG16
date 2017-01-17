@@ -9,24 +9,25 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -47,6 +48,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -81,6 +83,10 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     markers = new ArrayList<>();
     geofences = new ArrayList<>();
     CreateGoogleApi();
+
+    Configuration configuration = new Configuration(Resources.getSystem().getConfiguration());
+    configuration.locale = Locale.GERMANY; // or whichever locale you desire
+    Resources.getSystem().updateConfiguration(configuration, null);
 
     locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     provider = LocationManager.GPS_PROVIDER;
@@ -259,6 +265,14 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.setContentView(R.layout.help_dialog);
     dialog.setTitle(R.string.help);
     dialog.setCancelable(true);
+
+    TextView sw1 = (TextView) dialog.findViewById(R.id.lastUpdate);
+
+    CharSequence str = DateUtils.getRelativeDateTimeString(this, garageManager.lastUpdate.getTime(), DateUtils.SECOND_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+
+    sw1.setText(String.format("Letztes Update: %s", str).split(",")[0]);
+
+
 
     dialog.show();
   }

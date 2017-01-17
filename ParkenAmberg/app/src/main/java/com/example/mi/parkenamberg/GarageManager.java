@@ -20,6 +20,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -33,9 +34,11 @@ class GarageManager
   UpdateFinishedCallback UpdateCallback;
   private Handler internalUpdateHandler = new Handler();
   private ParkActivity context;
+  Date lastUpdate;
 
   GarageManager(ParkActivity mainActivity)
   {
+    lastUpdate = new Date();
     context = mainActivity;
     coder = new Geocoder(mainActivity);
 
@@ -188,6 +191,7 @@ class GarageManager
 
       return false;
     }
+    lastUpdate = new Date();
     return true;
   }
 
