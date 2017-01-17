@@ -135,14 +135,13 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     {
       case R.id.maptype:
       {
-        if (mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL)
-        {
-          mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        }
-        else
-        {
-          mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        }
+        Boolean setSattelite = mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL;
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("sattelite", setSattelite);
+        editor.apply();
+        mMap.setMapType(setSattelite ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
+
         break;
       }
       case R.id.favoriteSubMenu:
@@ -451,6 +450,16 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   {
     mMap = googleMap;
     mMap.setInfoWindowAdapter(new GarageInfoWindow(this, garageManager));
+
+    SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+    if (settings.getBoolean("sattelite", false))
+    {
+      mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+    else
+    {
+      mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
 
     mMap.moveCamera(CameraUpdateFactory.newLatLng(locationAmberg));
     //Map auf Überblick über Ring zoomen
