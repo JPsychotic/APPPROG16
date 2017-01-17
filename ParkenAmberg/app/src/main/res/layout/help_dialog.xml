@@ -1,24 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_margin="10dp">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_margin="10dp">
+
     <ScrollView
         android:id="@+id/helpContentScoller"
-        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+
         <LinearLayout
             android:id="@+id/contentContainer"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:orientation="horizontal"
+                android:rowCount="6">
+
+                <ImageView
+                    android:id="@+id/markerRed"
+                    android:layout_margin="5dp"
+                    android:layout_row="0"
+                    android:src="@drawable/garage_voll" />
+                <TextView
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_row="0"
+                    android:layout_margin="5dp"
+                    android:text="@string/red_help" />
+
+                <ImageView
+                    android:id="@+id/markerYellow"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/garage_fast_voll" />
+                <TextView
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_row="1"
+                    android:layout_margin="5dp"
+                    android:text="@string/yellow_help" />
+
+                <ImageView
+                    android:id="@+id/markerGreen"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/garage_free" />
+                <TextView
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_margin="5dp"
+                    android:layout_row="2"
+                    android:text="@string/green_help" />
+
+                <ImageView
+                    android:id="@+id/markerBlue"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/garage" />
+                <TextView
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_margin="5dp"
+                    android:layout_row="3"
+                    android:text="@string/blue_help" />
+
+
+                <TextView
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_margin="5dp"
+                    android:layout_row="4"
+                    android:text=" " />
+
+                <TextView
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_margin="5dp"
+                    android:layout_row="4"
+                    android:text=" " />
+
+
+
+            </GridLayout>
+
             <TextView
                 android:id="@+id/lastUpdate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""/>
+                android:text="" />
 
         </LinearLayout>
     </ScrollView>

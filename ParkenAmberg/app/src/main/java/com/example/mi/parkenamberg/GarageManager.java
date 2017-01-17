@@ -29,7 +29,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 class GarageManager
 {
   Boolean Initialized = false;
-  private Geocoder coder;
   private Garage[] garages = new Garage[8];
   UpdateFinishedCallback UpdateCallback;
   private Handler internalUpdateHandler = new Handler();
@@ -39,7 +38,6 @@ class GarageManager
   GarageManager(ParkActivity mainActivity)
   {
     context = mainActivity;
-    coder = new Geocoder(mainActivity);
 
     garages[0] = (new Garage(new LatLng(49.4416168,11.8590742), mainActivity.getString(R.string.garage0), 1));
     garages[1] = (new Garage(new LatLng(49.4464226,11.8547069), mainActivity.getString(R.string.garage1), 2));

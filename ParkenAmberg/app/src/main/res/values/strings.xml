@@ -33,4 +33,8 @@
     <string name="settingsTitle">Einstellungen</string>
     <string name="FavoritenMenuTitle">Favoriten</string>
     <string name="help">Hilfe</string>
+    <string name="red_help">Keine Parkplätze frei oder Parkhaus geschlossen</string>
+    <string name="yellow_help">0-20% der Parkplätze frei</string>
+    <string name="green_help">Mehr als 20% der Parkplätze frei</string>
+    <string name="blue_help">Keine Information verfügbar</string>
 </resources>
