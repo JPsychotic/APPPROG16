@@ -88,11 +88,12 @@ public class Garage {
      */
     Garage(LatLng l, String n, int id)
     {
-        if(l != null) location = l;
+        location = l;
         name = n;
         this.id = id;
         show = true;
         entered = false;
+        // 2 means no information about trend
         trend = 2;
     }
 

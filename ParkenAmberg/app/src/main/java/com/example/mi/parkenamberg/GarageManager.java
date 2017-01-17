@@ -38,18 +38,17 @@ class GarageManager
 
   GarageManager(ParkActivity mainActivity)
   {
-    lastUpdate = new Date();
     context = mainActivity;
     coder = new Geocoder(mainActivity);
 
-    garages[0] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address0)), mainActivity.getString(R.string.garage0), 1));
-    garages[1] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address1)), mainActivity.getString(R.string.garage1), 2));
-    garages[2] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address2)), mainActivity.getString(R.string.garage2), 3));
-    garages[3] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address3)), mainActivity.getString(R.string.garage3), 4));
-    garages[4] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address4)), mainActivity.getString(R.string.garage4), 5));
-    garages[5] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address5)), mainActivity.getString(R.string.garage5), 6));
-    garages[6] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address6)), mainActivity.getString(R.string.garage6), 7));
-    garages[7] = (new Garage(GetLocationFromAddress(mainActivity.getString(R.string.address7)), mainActivity.getString(R.string.garage7), 8));
+    garages[0] = (new Garage(new LatLng(49.4416168,11.8590742), mainActivity.getString(R.string.garage0), 1));
+    garages[1] = (new Garage(new LatLng(49.4464226,11.8547069), mainActivity.getString(R.string.garage1), 2));
+    garages[2] = (new Garage(new LatLng(49.4479491,11.8527369), mainActivity.getString(R.string.garage2), 3));
+    garages[3] = (new Garage(new LatLng(49.4487832,11.8565285), mainActivity.getString(R.string.garage3), 4));
+    garages[4] = (new Garage(new LatLng(49.4419695,11.857748), mainActivity.getString(R.string.garage4), 5));
+    garages[5] = (new Garage(new LatLng(49.44438,11.86432), mainActivity.getString(R.string.garage5), 6));
+    garages[6] = (new Garage(new LatLng(49.44145,11.85975), mainActivity.getString(R.string.garage6), 7));
+    garages[7] = (new Garage(new LatLng(49.44748,11.86143), mainActivity.getString(R.string.garage7), 8));
 
     Runnable runnable = new Runnable()
     {
@@ -84,40 +83,6 @@ class GarageManager
   ArrayList<Garage> GetGarages()
   {
     return new ArrayList<>(Arrays.asList(garages));
-  }
-
-  /**
-   * Returns the location of an address
-   *
-   * @param strAddress the address
-   * @return the location
-   */
-  private LatLng GetLocationFromAddress(String strAddress)
-  {
-    if (coder == null)
-    {
-      return null;
-    }
-
-    List<Address> address;
-    LatLng l;
-
-    try
-    {
-      address = coder.getFromLocationName(strAddress, 1);
-      if (address == null)
-      {
-        return null;
-      }
-      Address location = address.get(0);
-
-      l = new LatLng(location.getLatitude(), location.getLongitude());
-    } catch (Exception e)
-    {
-      return null;
-    }
-
-    return l;
   }
 
   void Update()
@@ -161,7 +126,7 @@ class GarageManager
           currentNodes = element.getElementsByTagName("Aktuell");
           closedNodes = element.getElementsByTagName("Geschlossen");
           trendNodes = element.getElementsByTagName("Trend");
-
+          Log.d(garages[id-1].getName(), "" +garages[id-1].getLocation());
           if (maxNodes.getLength() > 0)
           {
             Element max = (Element) maxNodes.item(0);

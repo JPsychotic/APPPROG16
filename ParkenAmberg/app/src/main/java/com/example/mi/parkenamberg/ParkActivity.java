@@ -267,13 +267,9 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     dialog.setCancelable(true);
 
     TextView sw1 = (TextView) dialog.findViewById(R.id.lastUpdate);
-
-    CharSequence str = DateUtils.getRelativeDateTimeString(this, garageManager.lastUpdate.getTime(), DateUtils.SECOND_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
-
+    CharSequence str = "noch nicht durchgeführt";
+    if(garageManager.lastUpdate != null) str = DateUtils.getRelativeDateTimeString(this, garageManager.lastUpdate.getTime(), DateUtils.SECOND_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
     sw1.setText(String.format("Letztes Update: %s", str).split(",")[0]);
-
-
-
     dialog.show();
   }
 
