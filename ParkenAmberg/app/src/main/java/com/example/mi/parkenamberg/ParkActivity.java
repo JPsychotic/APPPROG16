@@ -154,6 +154,11 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
         openSettingsMenu();
         break;
       }
+      case R.id.help:
+      {
+        openHelpMenu();
+        break;
+      }
       case R.id.homeButton:
       {
         if(mMap == null) break;
@@ -245,6 +250,15 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     sw6.setOnCheckedChangeListener(handler);
     sw7.setOnCheckedChangeListener(handler);
     sw8.setOnCheckedChangeListener(handler);
+
+    dialog.show();
+  }
+  private void openHelpMenu()
+  {
+    final Dialog dialog = new Dialog(ParkActivity.this);
+    dialog.setContentView(R.layout.help_dialog);
+    dialog.setTitle(R.string.help);
+    dialog.setCancelable(true);
 
     dialog.show();
   }
