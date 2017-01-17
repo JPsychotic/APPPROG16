@@ -641,7 +641,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
       snippet += "Parkhaus ist geschlossen";
     else if (g.getMaxPlaetze() > 0)
     {
-      snippet += (g.getMaxPlaetze() - g.getCurPlaetze());
+      snippet += Math.max(g.getMaxPlaetze() - g.getCurPlaetze(), 0);
     }
     else
     {
