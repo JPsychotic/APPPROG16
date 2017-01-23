@@ -102,7 +102,8 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     //Initialize the TextToSpeech API
-    resultSpeaker = new TextToSpeech(this, this.TTSOnInitListener);
+    if(resultSpeaker == null)
+      resultSpeaker = new TextToSpeech(this, this.TTSOnInitListener);
 
     //Start BroadcastReceiver
     IntentFilter filter = new IntentFilter(GeofenceResponseReceiver.GEOFENCE_RESPONSE);
@@ -415,6 +416,7 @@ public class ParkActivity extends AppCompatActivity implements GoogleApiClient.C
   public void onDestroy()
   {
     this.unregisterReceiver(receiver);
+    resultSpeaker.shutdown();
     super.onDestroy();
   }
 
