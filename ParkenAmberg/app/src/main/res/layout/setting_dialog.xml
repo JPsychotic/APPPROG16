@@ -33,7 +33,7 @@
             android:switchMinWidth="0dp"
             android:layout_marginBottom="20dp"
             android:enabled="true"
-            android:text="Hintergrundsprachausgabe aktivieren"
+            android:text="Hintergrund- sprachausgabe aktivieren"
             android:checked="true"/>
     </LinearLayout>
 </RelativeLayout>

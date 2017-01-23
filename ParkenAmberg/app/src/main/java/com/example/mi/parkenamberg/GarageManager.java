@@ -111,6 +111,7 @@ class GarageManager
   {
     try
     {
+      if(doc == null) return false;
       NodeList nodes = doc.getElementsByTagName("Parkhaus");
       for (int i = 0; i < nodes.getLength(); i++)
       {
